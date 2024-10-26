@@ -41,8 +41,10 @@ export default class PresentationScene {
     this.scene.add(light);
 
     // Boton para cambiar de escena
-    const button = document.createElement("custom-button");
-    document.body.appendChild(button);
+    const customButton = document.createElement('custom-button');
+    customButton.setAttribute('nombre', 'Siguiente');
+    customButton.setAttribute('operacion', '() => {}');
+    document.body.appendChild(customButton);
   }
 
   // Método para actualizar la escena

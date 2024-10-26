@@ -1,62 +1,56 @@
-// import '../style.css'
-// import javascriptLogo from '../javascript.svg'
-// import viteLogo from '/vite.svg'
-// import { setupCounter } from '../counter.js'
-//
-// document.querySelector('#app').innerHTML = `
-//   <div>
-//     <a href="https://vite.dev" target="_blank">
-//       <img src="${viteLogo}" class="logo" alt="Vite logo" />
-//     </a>
-//     <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-//       <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-//     </a>
-//     <h1>Hello Vite!</h1>
-//     <div class="card">
-//       <button id="counter" type="button"></button>
-//     </div>
-//     <p class="read-the-docs">
-//       Click on the Vite logo to learn more
-//     </p>
-//   </div>
-// `
-//
-// setupCounter(document.querySelector('#counter'))
 import * as THREE from "three";
 import PresentationScene from "./scenes/PresentationScene";
+import GameStateManager from "./state/gameStateManager";
+import MenuScene from "./scenes/MenuScene";
 
 let scene, camera, renderer;
 
-function init() {
-  // Crear la escena de presentación
-  const presentationScene = new PresentationScene();
-  scene = presentationScene.scene;
-  camera = presentationScene.camera;
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+const gameStateManager = new GameStateManager();
 
+const presentationScene = new PresentationScene();
+const menuScene = new MenuScene();
+
+function init() {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // Escuchar cambios de tamaño de pantalla
-  window.addEventListener("resize", () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-  });
+  camera = presentationScene.camera;
+  scene = presentationScene.scene;
 
   animate();
+  // setTimeout(SwitchToMenu, 5000);
+}
+
+function SwitchToMenu() {
+  scene.clear();
+  const menuScene = new MenuScene();
+  scene = menuScene.scene;
+  camera = menuScene.camera;
+  gameStateManager.changeState("menu");
 }
 
 function animate() {
   requestAnimationFrame(animate);
 
   // Actualizar la animación de la escena
-  if (scene && scene.update) {
-    scene.update();
-  }
-
+  // switch (gameStateManager.state) {
+  //   case "presentation":
+  //     presentationScene.update();
+  //     break;
+  //   case "menu":
+  //     // scene.update();
+  //     break;
+  //   case "playing":
+  //     // scene.update();
+  //     break;
+  //   case "paused":
+  //     // Lógica para el estado de pausa
+  //     break;
+  //   case "gameOver":
+  //     // Lógica para el estado de fin del juego
+  //     break;
+  // }
   renderer.render(scene, camera);
 }
 

@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 
 export default class MenuScene {
   constructor() {
@@ -21,17 +23,18 @@ export default class MenuScene {
     this.scene.add(this.menuBackground);
 
     // Texto "Niveles" como título del menú
-    const textGeometry = new THREE.TextGeometry("Niveles", {
-      font: new THREE.FontLoader().parse(
-        require("./helvetiker_regular.typeface.json")
-      ),
-      size: 1,
-      height: 0.2,
+    const fontLoader = new FontLoader();
+    fontLoader.load("./helvetiker_regular.typeface.json", (font) => {
+      const textGeometry = new TextGeometry("Niveles", {
+        font: font,
+        size: 1,
+        height: 0.2,
+      });
+      const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      this.title = new THREE.Mesh(textGeometry, textMaterial);
+      this.title.position.set(-2, 1, 0.1);
+      this.scene.add(this.title);
     });
-    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    this.title = new THREE.Mesh(textGeometry, textMaterial);
-    this.title.position.set(-2, 1, 0.1);
-    this.scene.add(this.title);
   }
 
   // Método de actualización
