@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import PhysicScene from "./scenes/PhysicScene";
 import PresentationScene from "./scenes/PresentationScene";
 import GameStateManager from "./state/gameStateManager";
 import MenuScene from "./scenes/MenuScene";
@@ -17,6 +18,7 @@ function init() {
 
   animate();
   // setTimeout(SwitchToMenu, 5000);
+  setTimeout(SwitchToPhysicScene, 5000);
 }
 
 function SwitchToMenu() {
@@ -27,12 +29,14 @@ function SwitchToMenu() {
   gameStateManager.changeState("menu");
 }
 
-function SwitchToPresentation() {
-  // scene.clear();
-  const presentationScene = new PresentationScene();
-  scene = presentationScene.scene;
-  camera = presentationScene.camera;
-  gameStateManager.changeState("presentation");
+function SwitchToPhysicScene() {
+  if (scene) scene.clear();
+  const physicScene = new PhysicScene();
+  scene = physicScene.scene;
+  camera = physicScene.camera;
+  gameStateManager.changeState("Escena de fisica");
+
+  
 }
 
 function animate() {

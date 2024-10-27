@@ -25,7 +25,7 @@ export default class GameStateManager {
 
   // Método para finalizar el juego
   endGame() {
-    this.changeState("gameOver");
+    this.changeState("GameOver");
   }
 
   // Método para avanzar al siguiente nivel
