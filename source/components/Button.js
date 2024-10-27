@@ -33,8 +33,8 @@ class CButton extends HTMLElement {
           transform: translate(-50%, -50%);
           padding: 10px;
           border: none;
-          background-color: #87ceeb;
-          color: white;
+          background-color: #fff;
+          color: black;
           font-family: Arial;
           font-size: 20px;
           cursor: pointer;

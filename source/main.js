@@ -1,66 +1,33 @@
-import * as THREE from "three";
-import PhysicScene from "./scenes/PhysicScene";
-import PresentationScene from "./scenes/PresentationScene";
-import GameStateManager from "./state/gameStateManager";
-import MenuScene from "./scenes/MenuScene";
+import Routes from "./routes";
+import "./index.css";
 
-let scene, camera, renderer;
+const routes = [
+  {
+    path: "/",
+    template: '<div id="presentacion"></div>',
+    load: () => import("./pages/PresentacioPage"),
+  },
+  {
+    path: "/menu",
+    template: '<div id="menu"></div>',
+    load: () => import("./pages/MenuPage"),
+  },
+  {
+    path: "/game",
+    template: '<div id="game-container"></div>',
+    load: () => import("./pages/GamePage"),
+  },
+];
 
-const gameStateManager = new GameStateManager();
+const router = new Routes(routes);
 
-const presentationScene = new PresentationScene();
-const menuScene = new MenuScene();
+document.querySelectorAll("a").forEach((anchor) => {
+  anchor.addEventListener("click", (e) => {
+    e.preventDefault();
+    const path = e.target.getAttribute("href").substring(1);
+    router.loadRoute(path);
+  });
+});
 
-function init() {
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
 
-  animate();
-  // setTimeout(SwitchToMenu, 5000);
-  setTimeout(SwitchToPhysicScene, 5000);
-}
-
-function SwitchToMenu() {
-  // scene.clear();
-  const menuScene = new MenuScene();
-  scene = menuScene.scene;
-  camera = menuScene.camera;
-  gameStateManager.changeState("menu");
-}
-
-function SwitchToPhysicScene() {
-  if (scene) scene.clear();
-  const physicScene = new PhysicScene();
-  scene = physicScene.scene;
-  camera = physicScene.camera;
-  gameStateManager.changeState("Escena de fisica");
-
-  
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Actualizar la animación de la escena
-  switch (gameStateManager.state) {
-    case "presentation":
-      SwitchToPresentation();
-      break;
-    case "menu":
-      SwitchToMenu();
-      break;
-    case "playing":
-      // scene.update();
-      break;
-    case "paused":
-      // Lógica para el estado de pausa
-      break;
-    case "gameOver":
-      // Lógica para el estado de fin del juego
-      break;
-  }
-  renderer.render(scene, camera);
-}
-
-init();
+export default router;
