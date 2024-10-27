@@ -15,42 +15,47 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  camera = presentationScene.camera;
-  scene = presentationScene.scene;
-
   animate();
   // setTimeout(SwitchToMenu, 5000);
 }
 
 function SwitchToMenu() {
-  scene.clear();
+  // scene.clear();
   const menuScene = new MenuScene();
   scene = menuScene.scene;
   camera = menuScene.camera;
   gameStateManager.changeState("menu");
 }
 
+function SwitchToPresentation() {
+  // scene.clear();
+  const presentationScene = new PresentationScene();
+  scene = presentationScene.scene;
+  camera = presentationScene.camera;
+  gameStateManager.changeState("presentation");
+}
+
 function animate() {
   requestAnimationFrame(animate);
 
   // Actualizar la animación de la escena
-  // switch (gameStateManager.state) {
-  //   case "presentation":
-  //     presentationScene.update();
-  //     break;
-  //   case "menu":
-  //     // scene.update();
-  //     break;
-  //   case "playing":
-  //     // scene.update();
-  //     break;
-  //   case "paused":
-  //     // Lógica para el estado de pausa
-  //     break;
-  //   case "gameOver":
-  //     // Lógica para el estado de fin del juego
-  //     break;
-  // }
+  switch (gameStateManager.state) {
+    case "presentation":
+      SwitchToPresentation();
+      break;
+    case "menu":
+      SwitchToMenu();
+      break;
+    case "playing":
+      // scene.update();
+      break;
+    case "paused":
+      // Lógica para el estado de pausa
+      break;
+    case "gameOver":
+      // Lógica para el estado de fin del juego
+      break;
+  }
   renderer.render(scene, camera);
 }
 
