@@ -1,55 +1,41 @@
 import * as THREE from "three";
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 class Auto {
-  constructor() {
-    this.auto = new THREE.Group(); // Agrupa todas las partes del auto
-  }
+    constructor() {
+        this.auto = new THREE.Group();
+        this.modelPath = './assets/model/Car.glb';
+        this.loader = new GLTFLoader();
+    }
 
-  create() {
-    // Crear la geometría del cuerpo del auto
-    const carGeometry = new THREE.BoxGeometry(1, 0.5, 2);
-    const carMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    const carBody = new THREE.Mesh(carGeometry, carMaterial);
-    carBody.position.y = 0.25;
+    create(onLoadCallback) {
+        this.loader.load(this.modelPath, (gltf) => {
+            this.auto = gltf.scene;
+            this.auto.scale.set(1, 1, 1);
+            this.auto.position.set(0, 10, 2);
 
-    // Crear las ruedas del auto
-    const wheelGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 32);
-    const wheelMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            if (onLoadCallback) {
+                onLoadCallback(this.auto);
+            }
+        }, undefined, (error) => {
+            console.error("Error loading the 3D model:", error);
+        });
+    }
 
-    // Crear y posicionar las cuatro ruedas
-    const frontLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-    frontLeftWheel.position.set(0.5, 0, 1);
-    frontLeftWheel.rotation.z = Math.PI / 2;
+    getAuto() {
+        return this.auto;
+    }
 
-    const frontRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-    frontRightWheel.position.set(-0.5, 0, 1);
-    frontRightWheel.rotation.z = Math.PI / 2;
+    move(x, y, z) {
+        const newPosition = new THREE.Vector3(x, y, z);
+        const direction = newPosition.clone().sub(this.auto.position).normalize();
+        this.auto.position.copy(newPosition);
 
-    const backLeftWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-    backLeftWheel.position.set(0.5, 0, -1);
-    backLeftWheel.rotation.z = Math.PI / 2;
-
-    const backRightWheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-    backRightWheel.position.set(-0.5, 0, -1);
-    backRightWheel.rotation.z = Math.PI / 2;
-
-    // Agrupar todas las partes del auto
-    this.auto.add(carBody);
-    this.auto.add(
-      frontLeftWheel,
-      frontRightWheel,
-      backLeftWheel,
-      backRightWheel
-    );
-  }
-
-  getAuto() {
-    return this.auto;
-  }
-
-  move(x, y, z) {
-    this.auto.position.set(x, y, z);
-  }
+        if (direction.length() > 0) {
+            const angle = Math.atan2(direction.x, direction.z);
+            this.auto.rotation.y = angle;
+        }
+    }
 }
 
 export default Auto;

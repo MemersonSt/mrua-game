@@ -23,11 +23,11 @@ body {
   margin: 0;
   padding: 0;
 }
-canvas {
-  display: block; /* Eliminar el espacio en línea del canvas */
-  width: 100%;
-  height: 100%;
-}
+/*canvas {*/
+/*  display: block; !* Eliminar el espacio en línea del canvas *!*/
+/*  width: 100%;*/
+/*  height: 100%;*/
+/*}*/
 
 button {
   font-family: inherit;
@@ -102,6 +102,15 @@ button {
   border-radius: 1rem;
 }
 
-#navegar-nivel::hover {
-  background-color: #5c5c5c;
+#game-container {
+  width: 0%;
+  height: 0%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
 }
