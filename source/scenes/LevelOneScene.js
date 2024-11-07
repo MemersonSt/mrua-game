@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import Auto from "../objets/Auto";
+import Swal from "sweetalert2"
 
 class LevelOneScene {
     constructor() {
@@ -127,17 +128,17 @@ class LevelOneScene {
     }
 
     checkGoal() {
-        const distanceToTarget = Math.abs(this.autoPosition.z - this.distanciaMeta);
+        const distanceToTarget = this.distanciaMeta - this.autoPosition.z;
+        const distaciaRecorrida = (this.velocity.z * this.accumulatedTime) + (0.50 * this.velocity.z * Math.pow(this.accumulatedTime, 2)) 
+
+        const message = "Felicidades! has llegado a la meta \n" + "Velocidad: " + this.velocity.z + "\n" + "Tiempo: " + this.accumulatedTime + "\n" + "Distancia recorrida: " + distaciaRecorrida;
         // Check if in the goal area
-        // if (distanceToTarget <= this.zonaMeta) {
-        //   alert("Felicidades! has llegado a la meta");
-        //   this.reset();
-        // }
-        // // Check if passed the goal
-        // else if (this.autoPosition.z < this.distanciaMeta) {
-        //   alert("You passed the goal, try again!");
-        //   this.reset();
-        // }
+        if (this.autoPosition.z >= this.zonaMeta) {
+            Swal.fire({
+                text: message
+            })
+          this.reset();
+        }
     }
 
     reset() {
