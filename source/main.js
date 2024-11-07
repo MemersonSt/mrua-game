@@ -1,5 +1,6 @@
 import Routes from "./routes";
 import "./index.css";
+import GameStateManager from "./state/gameStateManager.js";
 
 const routes = [
   {
@@ -20,6 +21,7 @@ const routes = [
 ];
 
 const router = new Routes(routes);
+const stateUser = new GameStateManager();
 
 document.querySelectorAll("a").forEach((anchor) => {
   anchor.addEventListener("click", (e) => {
@@ -29,5 +31,5 @@ document.querySelectorAll("a").forEach((anchor) => {
   });
 });
 
-
-export default router;
+export { router, stateUser };
+// export default router;

@@ -1,4 +1,4 @@
-export default class GameStateManager {
+class GameStateManager {
   constructor() {
     this.state = "presentation"; // Estado inicial
     this.score = 0;
@@ -44,3 +44,5 @@ export default class GameStateManager {
     }
   }
 }
+
+export default GameStateManager;

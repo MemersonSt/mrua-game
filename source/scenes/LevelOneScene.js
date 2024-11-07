@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import Auto from "../objets/Auto";
 import Swal from "sweetalert2"
+import {stateUser} from "../main.js";
 
 class LevelOneScene {
     constructor() {
@@ -14,6 +15,7 @@ class LevelOneScene {
         this.zonaMeta = 30; // Goal area
         this.isAccelerating = false; // Flag to check if accelerating
         this.accumulatedTime = 0; // Time accumulator for acceleration
+        this.dataUser = stateUser;
     }
 
     create() {
@@ -29,6 +31,40 @@ class LevelOneScene {
         this.camera.lookAt(this.autoPosition);
 
         // Create the ground
+        const ground = this.createGround();
+        this.scene.add(ground);
+
+        // Create the car
+        this.auto.create((car) => {
+            car.position.copy(this.autoPosition);
+            this.scene.add(car);
+        });
+
+        // Add light
+        const ambientLight = this.createLight();
+        this.scene.add(ambientLight);
+
+        const directionalLight = this.createLight();
+        this.scene.add(directionalLight);
+
+        const sky = this.createSky();
+        this.scene.add(sky);
+
+        this.createGoalArea();
+
+        // Add event listeners to move the car
+        document.addEventListener("keydown", (event) => this.handleKeyDown(event));
+        document.addEventListener("keyup", (event) => this.handleKeyUp(event));
+
+        // Render the scene
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(this.renderer.domElement);
+
+        this.animate();
+    }
+
+    createGround() {
         const groundGeometry = new THREE.PlaneGeometry(400, 400);
         const groundMaterial = new THREE.ShaderMaterial({
             uniforms: {
@@ -55,31 +91,31 @@ class LevelOneScene {
         });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2; // Rotate to be horizontal
-        this.scene.add(ground);
 
-        // Create the car
-        this.auto.create((car) => {
-            car.position.copy(this.autoPosition);
-            this.scene.add(car);
-        });
+        return ground;
+    }
 
-        // Add light
+    createLight() {
         const ambientLight = new THREE.AmbientLight(0x404040); // Ambient light
         this.scene.add(ambientLight);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Directional light
         directionalLight.position.set(5, 10, 7.5);
-        this.scene.add(directionalLight);
 
-        // Load the sky texture
+        return directionalLight;
+    }
+
+    createSky() {
         const sky = new THREE.Mesh(
             new THREE.SphereGeometry(100, 32, 32),
             new THREE.MeshBasicMaterial({ color: 0x87ceeb })
         );
         sky.material.side = THREE.BackSide; // Render the sky on the back side
-        this.scene.add(sky);
 
-        // Create the goal area
+        return sky;
+    }
+
+    createGoalArea() {
         const metaGeometry = new THREE.PlaneGeometry(5, 5);
         const metaMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
         this.areaMeta = new THREE.Mesh(metaGeometry, metaMaterial);
@@ -87,17 +123,6 @@ class LevelOneScene {
         this.areaMeta.position.z = this.distanciaMeta;
         this.areaMeta.position.y = 0.01; // Slightly above the ground
         this.scene.add(this.areaMeta);
-
-        // Add event listeners to move the car
-        document.addEventListener("keydown", (event) => this.handleKeyDown(event));
-        document.addEventListener("keyup", (event) => this.handleKeyUp(event));
-
-        // Render the scene
-        this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
-
-        this.animate();
     }
 
     handleKeyDown(event) {
