@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Auto from "../objets/Auto";
-import Swal from "sweetalert2"
+import Swal from "sweetalert2";
 import {stateUser} from "../main.js";
 
 class LevelOneScene {
@@ -16,6 +16,7 @@ class LevelOneScene {
         this.isAccelerating = false; // Flag to check if accelerating
         this.accumulatedTime = 0; // Time accumulator for acceleration
         this.dataUser = stateUser;
+        this.movingObjects = []; // Array to store moving objects
     }
 
     create() {
@@ -52,6 +53,9 @@ class LevelOneScene {
 
         this.createGoalArea();
 
+        // Create moving objects
+        this.createMovingObjects();
+
         // Add event listeners to move the car
         document.addEventListener("keydown", (event) => this.handleKeyDown(event));
         document.addEventListener("keyup", (event) => this.handleKeyUp(event));
@@ -68,8 +72,8 @@ class LevelOneScene {
         const groundGeometry = new THREE.PlaneGeometry(400, 400);
         const groundMaterial = new THREE.ShaderMaterial({
             uniforms: {
-                color1: { value: new THREE.Color(0xffa500) }, // Orange color
-                color2: { value: new THREE.Color(0xffffff) }  // White color
+                color1: {value: new THREE.Color(0xffa500)}, // Orange color
+                color2: {value: new THREE.Color(0xffffff)}  // White color
             },
             vertexShader: `
                 varying vec3 vPosition;
@@ -108,7 +112,7 @@ class LevelOneScene {
     createSky() {
         const sky = new THREE.Mesh(
             new THREE.SphereGeometry(100, 32, 32),
-            new THREE.MeshBasicMaterial({ color: 0x87ceeb })
+            new THREE.MeshBasicMaterial({color: 0x87ceeb})
         );
         sky.material.side = THREE.BackSide; // Render the sky on the back side
 
@@ -117,12 +121,35 @@ class LevelOneScene {
 
     createGoalArea() {
         const metaGeometry = new THREE.PlaneGeometry(5, 5);
-        const metaMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
+        const metaMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, side: THREE.DoubleSide});
         this.areaMeta = new THREE.Mesh(metaGeometry, metaMaterial);
         this.areaMeta.rotation.x = Math.PI / 2;
         this.areaMeta.position.z = this.distanciaMeta;
         this.areaMeta.position.y = 0.01; // Slightly above the ground
         this.scene.add(this.areaMeta);
+    }
+
+    createMovingObjects() {
+        const geometryTypes = [
+            new THREE.CircleGeometry(1, 32),
+            new THREE.BoxGeometry(1, 1, 1),
+            new THREE.ConeGeometry(1, 2, 32)
+        ];
+
+        for (let i = 0; i < 50; i++) {
+            const geometry = geometryTypes[Math.floor(Math.random() * geometryTypes.length)];
+            const material = new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff});
+            const object = new THREE.Mesh(geometry, material);
+
+            object.position.set(
+                (Math.random() - 0.5) * 400,
+                0.5,
+                (Math.random() - 0.5) * 400
+            );
+
+            this.movingObjects.push(object);
+            this.scene.add(object);
+        }
     }
 
     handleKeyDown(event) {
@@ -152,9 +179,18 @@ class LevelOneScene {
         }
     }
 
+    updateMovingObjects(deltaTime) {
+        this.movingObjects.forEach((object) => {
+            object.position.z += this.velocity.z * deltaTime * 60; // Move objects in the opposite direction
+            if (object.position.z > 200) {
+                object.position.z = -200; // Reset position if out of bounds
+            }
+        });
+    }
+
     checkGoal() {
         const distanceToTarget = this.distanciaMeta - this.autoPosition.z;
-        const distaciaRecorrida = (this.velocity.z * this.accumulatedTime) + (0.50 * this.velocity.z * Math.pow(this.accumulatedTime, 2)) 
+        const distaciaRecorrida = (this.velocity.z * this.accumulatedTime) + (0.50 * this.velocity.z * Math.pow(this.accumulatedTime, 2))
 
         const message = "Felicidades! has llegado a la meta \n" + "Velocidad: " + this.velocity.z + "\n" + "Tiempo: " + this.accumulatedTime + "\n" + "Distancia recorrida: " + distaciaRecorrida;
         // Check if in the goal area
@@ -162,7 +198,7 @@ class LevelOneScene {
             Swal.fire({
                 text: message
             })
-          this.reset();
+            this.reset();
         }
     }
 
@@ -181,9 +217,10 @@ class LevelOneScene {
     animate() {
         requestAnimationFrame(() => this.animate());
 
-        const deltaTime = 0.016; // Assume 60 FPS, so ~16ms per frame
+        const deltaTime = 0.016;
 
         this.updateAcceleration(deltaTime);
+        this.updateMovingObjects(deltaTime);
 
         // Update car position based on velocity
         this.autoPosition.add(this.velocity);
